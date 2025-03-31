@@ -9,6 +9,7 @@ type Props = {
   addTodo: (title: string) => Promise<void>;
   setNewError: (newErrorMessage: Errors) => void;
   changeAllIsComplated: () => void;
+  isFocusAddForm: boolean;
 };
 
 export const Header: React.FC<Props> = ({
@@ -16,6 +17,7 @@ export const Header: React.FC<Props> = ({
   addTodo,
   setNewError,
   changeAllIsComplated,
+  isFocusAddForm,
 }) => {
   return (
     <header className="todoapp__header">
@@ -30,7 +32,11 @@ export const Header: React.FC<Props> = ({
         />
       )}
 
-      <NewTodoForm addTodo={addTodo} setNewError={setNewError} />
+      <NewTodoForm
+        addTodo={addTodo}
+        setNewError={setNewError}
+        isFocusAddForm={isFocusAddForm}
+      />
     </header>
   );
 };

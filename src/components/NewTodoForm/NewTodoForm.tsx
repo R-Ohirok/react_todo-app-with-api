@@ -4,16 +4,21 @@ import { Errors } from '../../types/Errors';
 type Props = {
   addTodo: (title: string) => Promise<void>;
   setNewError: (newErrorMessage: Errors) => void;
+  isFocusAddForm: boolean;
 };
 
-export const NewTodoForm: React.FC<Props> = ({ addTodo, setNewError }) => {
+export const NewTodoForm: React.FC<Props> = ({
+  addTodo,
+  setNewError,
+  isFocusAddForm,
+}) => {
   const [query, setQuery] = useState('');
   const [isAdded, setIsAdded] = useState(false);
   const field = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     field.current?.focus();
-  }, [addTodo]);
+  }, [isFocusAddForm]);
 
   const createTodo = (todoTitle: string) => {
     if (!todoTitle.trim()) {

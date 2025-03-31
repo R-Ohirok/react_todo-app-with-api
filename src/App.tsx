@@ -35,6 +35,12 @@ export const App: React.FC = () => {
   const [isLoadedIDs, setIsLoadedIDs] = useState<number[]>([]);
   const [tempTodo, setTempTodo] = useState<Todo | null>(null);
 
+  const isFocusAddForm = useRef(false);
+
+  useEffect(() => {
+    isFocusAddForm.current = false;
+  });
+
   const timerId = useRef(0);
 
   const changeErrorMesssage = (newErrorMessage: Errors) => {
@@ -68,8 +74,9 @@ export const App: React.FC = () => {
           currentTodos.filter(todo => todo.id !== todoId),
         );
       })
-      .catch(() => {
+      .catch(error => {
         changeErrorMesssage(Errors.Delete);
+        throw new Error(error);
       })
       .finally(() => {
         setIsLoadedIDs((loadingIDs: number[]) => {
@@ -79,6 +86,7 @@ export const App: React.FC = () => {
 
           return stilLoadingIDs;
         });
+        isFocusAddForm.current = true;
       });
   };
 
@@ -116,6 +124,7 @@ export const App: React.FC = () => {
       })
       .finally(() => {
         setTempTodo(null);
+        isFocusAddForm.current = true;
       });
   };
 
@@ -181,8 +190,9 @@ export const App: React.FC = () => {
           );
         });
       })
-      .catch(() => {
+      .catch(error => {
         changeErrorMesssage(Errors.Update);
+        throw new Error(error);
       })
       .finally(() => {
         setIsLoadedIDs((loadingIDs: number[]) => {
@@ -205,6 +215,7 @@ export const App: React.FC = () => {
           addTodo={handleAddTodo}
           setNewError={changeErrorMesssage}
           changeAllIsComplated={handleChangeAllIsCompleted}
+          isFocusAddForm={isFocusAddForm.current}
         />
 
         <TodoList

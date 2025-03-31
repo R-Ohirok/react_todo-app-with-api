@@ -47,22 +47,22 @@ export const TodoField: React.FC<Props> = ({
 
     if (!newTitle.trim()) {
       deleteTodo(todo.id)
-        ?.catch(() => {
-          setIsSelected(true);
-        })
-        .then(() => {
+        ?.then(() => {
           setIsSelected(false);
+        })
+        .catch(() => {
+          setIsSelected(true);
         });
 
       return;
     }
 
     changeTodo(todo, newTitle.trim())
-      ?.catch(() => {
-        setIsSelected(true);
-      })
-      .then(() => {
+      ?.then(() => {
         setIsSelected(false);
+      })
+      .catch(() => {
+        setIsSelected(true);
       });
   };
 
@@ -77,7 +77,7 @@ export const TodoField: React.FC<Props> = ({
           data-cy="TodoStatus"
           type="checkbox"
           className="todo__status"
-          defaultChecked={todo.completed}
+          checked={todo.completed}
           onChange={() => handleChangeCompleted(todo)}
         />
       </label>
