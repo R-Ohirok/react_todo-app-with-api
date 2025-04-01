@@ -12,6 +12,8 @@ type Props = {
   tempTodo: Todo | null;
   changeCompleted: (todoToChange: Todo) => void;
   changeTodo: (todoToChange: Todo, newTitle: string) => Promise<void>;
+  editingTodoId: number | null;
+  setEditingTodoId: (value: number | null) => void;
 };
 
 export const TodoList: React.FC<Props> = ({
@@ -22,6 +24,8 @@ export const TodoList: React.FC<Props> = ({
   tempTodo,
   changeCompleted,
   changeTodo,
+  editingTodoId,
+  setEditingTodoId,
 }) => {
   return (
     <section className="todoapp__main" data-cy="TodoList">
@@ -34,6 +38,8 @@ export const TodoList: React.FC<Props> = ({
           setIsLoadedIDs={setIsLoadedIDs}
           changeCompleted={changeCompleted}
           changeTodo={changeTodo}
+          editingTodoId={editingTodoId}
+          setEditingTodoId={setEditingTodoId}
         />
       ))}
 
@@ -44,6 +50,8 @@ export const TodoList: React.FC<Props> = ({
           isLoadedIDs={[0]}
           setIsLoadedIDs={() => {}}
           changeCompleted={() => {}}
+          editingTodoId={null}
+          setEditingTodoId={() => {}}
         />
       )}
     </section>

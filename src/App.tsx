@@ -34,6 +34,7 @@ export const App: React.FC = () => {
   const [filterBy, setFilterBy] = useState(FilterBy.All);
   const [isLoadedIDs, setIsLoadedIDs] = useState<number[]>([]);
   const [tempTodo, setTempTodo] = useState<Todo | null>(null);
+  const [editingTodoId, setEditingTodoId] = useState<number | null>(null);
 
   const isFocusAddForm = useRef(false);
 
@@ -226,6 +227,8 @@ export const App: React.FC = () => {
           tempTodo={tempTodo}
           changeCompleted={handleChangeCompleted}
           changeTodo={handleChangeTodo}
+          editingTodoId={editingTodoId}
+          setEditingTodoId={setEditingTodoId}
         />
 
         {todos.length !== 0 && (

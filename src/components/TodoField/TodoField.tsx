@@ -1,5 +1,5 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import cn from 'classnames';
 import { Todo } from '../../types/Todo';
 
@@ -10,6 +10,8 @@ type Props = {
   changeCompleted: (todoToChange: Todo) => void;
   deleteTodo?: (id: number) => Promise<void>;
   changeTodo?: (todoToChange: Todo, newTitle: string) => Promise<void>;
+  editingTodoId: number | null;
+  setEditingTodoId: (value: number | null) => void;
 };
 
 export const TodoField: React.FC<Props> = ({
@@ -19,9 +21,19 @@ export const TodoField: React.FC<Props> = ({
   changeCompleted,
   deleteTodo = () => {},
   changeTodo = () => {},
+  setEditingTodoId,
+  editingTodoId,
 }) => {
-  const [isSelected, setIsSelected] = useState(false);
   const [todoTitle, setTodoTitle] = useState(todo.title);
+
+  const inputRef = useRef<HTMLInputElement>(null);
+  const isEditing = editingTodoId === todo.id;
+
+  useEffect(() => {
+    if (isEditing && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [isEditing]);
 
   const handleDeleteTodo = (todoId: number) => {
     setIsLoadedIDs([todoId, ...isLoadedIDs]);
@@ -40,7 +52,7 @@ export const TodoField: React.FC<Props> = ({
     event.preventDefault();
 
     if (newTitle.trim() === todo.title) {
-      setIsSelected(false);
+      setEditingTodoId(null);
     }
 
     setIsLoadedIDs([todo.id, ...isLoadedIDs]);
@@ -48,10 +60,10 @@ export const TodoField: React.FC<Props> = ({
     if (!newTitle.trim()) {
       deleteTodo(todo.id)
         ?.then(() => {
-          setIsSelected(false);
+          setEditingTodoId(null);
         })
         .catch(() => {
-          setIsSelected(true);
+          setEditingTodoId(todo.id);
         });
 
       return;
@@ -59,15 +71,16 @@ export const TodoField: React.FC<Props> = ({
 
     changeTodo(todo, newTitle.trim())
       ?.then(() => {
-        setIsSelected(false);
+        setEditingTodoId(null);
       })
       .catch(() => {
-        setIsSelected(true);
+        setEditingTodoId(todo.id);
       });
   };
 
   const handleSelectTodo = () => {
-    setIsSelected(true);
+    setEditingTodoId(todo.id);
+    setTodoTitle(todo.title);
   };
 
   return (
@@ -82,18 +95,18 @@ export const TodoField: React.FC<Props> = ({
         />
       </label>
 
-      {isSelected ? (
+      {isEditing ? (
         <form
           onBlur={event => handleEditTodo(event, todoTitle)}
           onSubmit={event => handleEditTodo(event, todoTitle)}
           onKeyUp={event => {
             if (event.key === 'Escape') {
-              setIsSelected(false);
+              setEditingTodoId(null);
             }
           }}
         >
           <input
-            autoFocus
+            ref={inputRef}
             data-cy="TodoTitleField"
             type="text"
             className="todo__title-field"
