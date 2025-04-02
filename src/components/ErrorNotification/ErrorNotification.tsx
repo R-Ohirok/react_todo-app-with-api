@@ -7,40 +7,43 @@ type Props = {
   setErrorMessage: (newErrorMessage: Errors) => void;
 };
 
-export const ErrorNotification: React.FC<Props> = ({
-  errorMessage,
-  setErrorMessage,
-}) => {
-  const timerId = useRef(0);
+// eslint-disable-next-line react/display-name
+export const ErrorNotification: React.FC<Props> = React.memo(
+  ({ errorMessage, setErrorMessage }) => {
+    const timerId = useRef(0);
 
-  useEffect(() => {
-    if (errorMessage !== Errors.No_Error) {
-      window.clearTimeout(timerId.current);
+    useEffect(() => {
+      if (errorMessage !== Errors.No_Error) {
+        window.clearTimeout(timerId.current);
 
-      timerId.current = window.setTimeout(
-        () => setErrorMessage(Errors.No_Error),
-        3000,
-      );
-    }
-  }, [errorMessage]);
+        timerId.current = window.setTimeout(
+          () => setErrorMessage(Errors.No_Error),
+          3000,
+        );
+      }
+    }, [errorMessage]);
 
-  return (
-    <div
-      data-cy="ErrorNotification"
-      className={cn('notification is-danger is-light has-text-weight-normal', {
-        hidden: !errorMessage,
-      })}
-    >
-      <button
-        data-cy="HideErrorButton"
-        type="button"
-        className="delete"
-        onClick={() => {
-          setErrorMessage(Errors.No_Error);
-          window.clearTimeout(timerId.current);
-        }}
-      />
-      {errorMessage}
-    </div>
-  );
-};
+    return (
+      <div
+        data-cy="ErrorNotification"
+        className={cn(
+          'notification is-danger is-light has-text-weight-normal',
+          {
+            hidden: !errorMessage,
+          },
+        )}
+      >
+        <button
+          data-cy="HideErrorButton"
+          type="button"
+          className="delete"
+          onClick={() => {
+            setErrorMessage(Errors.No_Error);
+            window.clearTimeout(timerId.current);
+          }}
+        />
+        {errorMessage}
+      </div>
+    );
+  },
+);

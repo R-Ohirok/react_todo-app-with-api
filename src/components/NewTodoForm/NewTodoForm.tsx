@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Errors } from '../../types/Errors';
 
 type Props = {
@@ -20,7 +20,7 @@ export const NewTodoForm: React.FC<Props> = ({
     field.current?.focus();
   }, [isFocusAddForm]);
 
-  const createTodo = (todoTitle: string) => {
+  const createTodo = useCallback((todoTitle: string) => {
     if (!todoTitle.trim()) {
       setNewError(Errors.EmptyTitle);
 
@@ -35,7 +35,7 @@ export const NewTodoForm: React.FC<Props> = ({
       .finally(() => {
         setIsAdded(false);
       });
-  };
+  }, []);
 
   return (
     <form

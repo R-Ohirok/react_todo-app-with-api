@@ -16,44 +16,47 @@ type Props = {
   setEditingTodoId: (value: number | null) => void;
 };
 
-export const TodoList: React.FC<Props> = ({
-  todos,
-  deleteTodo,
-  isLoadedIDs,
-  setIsLoadedIDs,
-  tempTodo,
-  changeCompleted,
-  changeTodo,
-  editingTodoId,
-  setEditingTodoId,
-}) => {
-  return (
-    <section className="todoapp__main" data-cy="TodoList">
-      {todos.map(todo => (
-        <TodoField
-          key={todo.id}
-          todo={todo}
-          deleteTodo={deleteTodo}
-          isLoadedIDs={isLoadedIDs}
-          setIsLoadedIDs={setIsLoadedIDs}
-          changeCompleted={changeCompleted}
-          changeTodo={changeTodo}
-          editingTodoId={editingTodoId}
-          setEditingTodoId={setEditingTodoId}
-        />
-      ))}
+// eslint-disable-next-line react/display-name
+export const TodoList: React.FC<Props> = React.memo(
+  ({
+    todos,
+    deleteTodo,
+    isLoadedIDs,
+    setIsLoadedIDs,
+    tempTodo,
+    changeCompleted,
+    changeTodo,
+    editingTodoId,
+    setEditingTodoId,
+  }) => {
+    return (
+      <section className="todoapp__main" data-cy="TodoList">
+        {todos.map(todo => (
+          <TodoField
+            key={todo.id}
+            todo={todo}
+            deleteTodo={deleteTodo}
+            isLoadedIDs={isLoadedIDs}
+            setIsLoadedIDs={setIsLoadedIDs}
+            changeCompleted={changeCompleted}
+            changeTodo={changeTodo}
+            editingTodoId={editingTodoId}
+            setEditingTodoId={setEditingTodoId}
+          />
+        ))}
 
-      {tempTodo && (
-        <TodoField
-          key={tempTodo.id}
-          todo={tempTodo}
-          isLoadedIDs={[0]}
-          setIsLoadedIDs={() => {}}
-          changeCompleted={() => {}}
-          editingTodoId={null}
-          setEditingTodoId={() => {}}
-        />
-      )}
-    </section>
-  );
-};
+        {tempTodo && (
+          <TodoField
+            key={tempTodo.id}
+            todo={tempTodo}
+            isLoadedIDs={[0]}
+            setIsLoadedIDs={() => {}}
+            changeCompleted={() => {}}
+            editingTodoId={null}
+            setEditingTodoId={() => {}}
+          />
+        )}
+      </section>
+    );
+  },
+);

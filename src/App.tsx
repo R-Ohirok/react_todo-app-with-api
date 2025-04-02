@@ -1,7 +1,12 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 /* eslint-disable jsx-a11y/control-has-associated-label */
-import React, { useEffect, useRef, useState } from 'react';
-// import { UserWarning } from './UserWarning';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import * as todoServices from './api/todos';
 import { Todo } from './types/Todo';
 import { TodoList } from './components/TodoList';
@@ -36,10 +41,10 @@ export const App: React.FC = () => {
   const [tempTodo, setTempTodo] = useState<Todo | null>(null);
   const [editingTodoId, setEditingTodoId] = useState<number | null>(null);
 
-  const isFocusAddForm = useRef(false);
+  const isFocusAddFormTrigger = useRef(false);
 
   useEffect(() => {
-    isFocusAddForm.current = false;
+    isFocusAddFormTrigger.current = false;
   });
 
   useEffect(() => {
@@ -53,9 +58,12 @@ export const App: React.FC = () => {
       });
   }, []);
 
-  const filteredTodos = filterTodos(todos, filterBy);
+  const filteredTodos = useMemo(
+    () => filterTodos(todos, filterBy),
+    [todos, filterBy],
+  );
 
-  const handleDeleteTodo = (todoId: number) => {
+  const handleDeleteTodo = useCallback((todoId: number) => {
     return todoServices
       .deleteTodo(todoId)
       .then(() => {
@@ -69,17 +77,17 @@ export const App: React.FC = () => {
       })
       .finally(() => {
         setIsLoadedIDs((loadingIDs: number[]) => {
-          const stilLoadingIDs = loadingIDs;
+          const stilLoadingIDs = [...loadingIDs];
 
           stilLoadingIDs.pop();
 
           return stilLoadingIDs;
         });
-        isFocusAddForm.current = true;
+        isFocusAddFormTrigger.current = true;
       });
-  };
+  }, []);
 
-  const handleDeleteCompletedTodo = () => {
+  const handleDeleteCompletedTodo = useCallback(() => {
     const completedTodos = todos.filter(todo => todo.completed);
 
     completedTodos.forEach(todo => {
@@ -89,9 +97,9 @@ export const App: React.FC = () => {
       ]);
       handleDeleteTodo(todo.id);
     });
-  };
+  }, [todos]);
 
-  const handleAddTodo = (todoTitle: string) => {
+  const handleAddTodo = useCallback((todoTitle: string) => {
     const newTodoToAdd = {
       userId: todoServices.USER_ID,
       title: todoTitle.trim(),
@@ -113,11 +121,11 @@ export const App: React.FC = () => {
       })
       .finally(() => {
         setTempTodo(null);
-        isFocusAddForm.current = true;
+        isFocusAddFormTrigger.current = true;
       });
-  };
+  }, []);
 
-  const handleChangeCompleted = (todoToChange: Todo) => {
+  const handleChangeCompleted = useCallback((todoToChange: Todo) => {
     const changedTodo = { ...todoToChange, completed: !todoToChange.completed };
 
     todoServices
@@ -134,16 +142,16 @@ export const App: React.FC = () => {
       })
       .finally(() => {
         setIsLoadedIDs((loadingIDs: number[]) => {
-          const stilLoadingIDs = loadingIDs;
+          const stilLoadingIDs = [...loadingIDs];
 
           stilLoadingIDs.pop();
 
           return stilLoadingIDs;
         });
       });
-  };
+  }, []);
 
-  const handleChangeAllIsCompleted = () => {
+  const handleChangeAllIsCompleted = useCallback(() => {
     if (todos.every(todo => todo.completed)) {
       todos.forEach(todo => {
         setIsLoadedIDs((alreadyLoadedIDs: number[]) => [
@@ -165,34 +173,37 @@ export const App: React.FC = () => {
       ]);
       handleChangeCompleted(todo);
     });
-  };
+  }, [todos]);
 
-  const handleChangeTodo = (todoToChange: Todo, newTodoTitle: string) => {
-    const changedTodo = { ...todoToChange, title: newTodoTitle };
+  const handleChangeTodo = useCallback(
+    (todoToChange: Todo, newTodoTitle: string) => {
+      const changedTodo = { ...todoToChange, title: newTodoTitle };
 
-    return todoServices
-      .updateTodo(changedTodo)
-      .then(updatedTodo => {
-        setTodos(currentTodos => {
-          return currentTodos.map(todo =>
-            todo.id === updatedTodo.id ? updatedTodo : todo,
-          );
+      return todoServices
+        .updateTodo(changedTodo)
+        .then(updatedTodo => {
+          setTodos(currentTodos => {
+            return currentTodos.map(todo =>
+              todo.id === updatedTodo.id ? updatedTodo : todo,
+            );
+          });
+        })
+        .catch(error => {
+          setErrorMessage(Errors.Update);
+          throw new Error(error);
+        })
+        .finally(() => {
+          setIsLoadedIDs((loadingIDs: number[]) => {
+            const stilLoadingIDs = [...loadingIDs];
+
+            stilLoadingIDs.pop();
+
+            return stilLoadingIDs;
+          });
         });
-      })
-      .catch(error => {
-        setErrorMessage(Errors.Update);
-        throw new Error(error);
-      })
-      .finally(() => {
-        setIsLoadedIDs((loadingIDs: number[]) => {
-          const stilLoadingIDs = loadingIDs;
-
-          stilLoadingIDs.pop();
-
-          return stilLoadingIDs;
-        });
-      });
-  };
+    },
+    [],
+  );
 
   return (
     <div className="todoapp">
@@ -204,7 +215,7 @@ export const App: React.FC = () => {
           addTodo={handleAddTodo}
           setNewError={setErrorMessage}
           changeAllIsComplated={handleChangeAllIsCompleted}
-          isFocusAddForm={isFocusAddForm.current}
+          isFocusAddForm={isFocusAddFormTrigger.current}
         />
 
         <TodoList
