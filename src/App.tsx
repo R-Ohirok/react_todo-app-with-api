@@ -42,18 +42,6 @@ export const App: React.FC = () => {
     isFocusAddForm.current = false;
   });
 
-  const timerId = useRef(0);
-
-  const changeErrorMesssage = (newErrorMessage: Errors) => {
-    window.clearTimeout(timerId.current);
-
-    setErrorMessage(newErrorMessage);
-    timerId.current = window.setTimeout(
-      () => setErrorMessage(Errors.No_Error),
-      3000,
-    );
-  };
-
   useEffect(() => {
     todoServices
       .getTodos()
@@ -61,7 +49,7 @@ export const App: React.FC = () => {
         setTodos(todosFromServer);
       })
       .catch(() => {
-        changeErrorMesssage(Errors.Load);
+        setErrorMessage(Errors.Load);
       });
   }, []);
 
@@ -76,7 +64,7 @@ export const App: React.FC = () => {
         );
       })
       .catch(error => {
-        changeErrorMesssage(Errors.Delete);
+        setErrorMessage(Errors.Delete);
         throw new Error(error);
       })
       .finally(() => {
@@ -120,7 +108,7 @@ export const App: React.FC = () => {
         setTodos(currentTodos => [...currentTodos, newTodo]);
       })
       .catch(error => {
-        changeErrorMesssage(Errors.Add);
+        setErrorMessage(Errors.Add);
         throw error;
       })
       .finally(() => {
@@ -142,7 +130,7 @@ export const App: React.FC = () => {
         });
       })
       .catch(() => {
-        changeErrorMesssage(Errors.Update);
+        setErrorMessage(Errors.Update);
       })
       .finally(() => {
         setIsLoadedIDs((loadingIDs: number[]) => {
@@ -192,7 +180,7 @@ export const App: React.FC = () => {
         });
       })
       .catch(error => {
-        changeErrorMesssage(Errors.Update);
+        setErrorMessage(Errors.Update);
         throw new Error(error);
       })
       .finally(() => {
@@ -214,7 +202,7 @@ export const App: React.FC = () => {
         <Header
           todos={todos}
           addTodo={handleAddTodo}
-          setNewError={changeErrorMesssage}
+          setNewError={setErrorMessage}
           changeAllIsComplated={handleChangeAllIsCompleted}
           isFocusAddForm={isFocusAddForm.current}
         />
@@ -244,7 +232,6 @@ export const App: React.FC = () => {
       <ErrorNotification
         errorMessage={errorMessage}
         setErrorMessage={setErrorMessage}
-        timerId={timerId}
       />
     </div>
   );

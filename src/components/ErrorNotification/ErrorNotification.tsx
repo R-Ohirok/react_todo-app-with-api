@@ -1,18 +1,29 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import cn from 'classnames';
 import { Errors } from '../../types/Errors';
 
 type Props = {
   errorMessage: Errors;
   setErrorMessage: (newErrorMessage: Errors) => void;
-  timerId: React.MutableRefObject<number>;
 };
 
 export const ErrorNotification: React.FC<Props> = ({
   errorMessage,
   setErrorMessage,
-  timerId,
 }) => {
+  const timerId = useRef(0);
+
+  useEffect(() => {
+    if (errorMessage !== Errors.No_Error) {
+      window.clearTimeout(timerId.current);
+
+      timerId.current = window.setTimeout(
+        () => setErrorMessage(Errors.No_Error),
+        3000,
+      );
+    }
+  }, [errorMessage]);
+
   return (
     <div
       data-cy="ErrorNotification"
